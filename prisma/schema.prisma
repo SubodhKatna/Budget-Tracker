@@ -15,7 +15,8 @@ datasource db {
 
 model UserSettings {
   userId       String @id
-  currentTheme String
+  currentTheme String?
+  currency     String
 }
 
 model Category {
@@ -29,37 +30,36 @@ model Category {
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  amount      Float
-  description String
-  date        DateTime
-  userId      String
-  type        String   @default("income")
-  category    String
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  amount       Float
+  description  String
+  date         DateTime
+  userId       String
+  type         String   @default("income")
+  category     String
   categoryIcon String
 
   @@index([userId])
 }
 
-
-model MonthHistory{
-  userId String
-  day Int
-  month Int
-  year Int
-  income Float
+model MonthHistory {
+  userId  String
+  day     Int
+  month   Int
+  year    Int
+  income  Float
   expense Float
 
   @@id([day, month, year, userId])
 }
 
-model YearHistory{
-  userId String
-  month Int
-  year Int
-  income Float
+model YearHistory {
+  userId  String
+  month   Int
+  year    Int
+  income  Float
   expense Float
 
   @@id([month, year, userId])

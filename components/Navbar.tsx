@@ -4,7 +4,7 @@ import Logo, { LogoMobile } from "./Logo";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "./ui/button";
+import { Button } from "./ui/button";
 import { ThemeSwitcherBtn } from "./ThemeSwitcherBtn";
 import { UserButton } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
@@ -12,10 +12,10 @@ import { Menu } from "lucide-react";
 
 function Navbar() {
   return (
-    <div>
+    <>
       <DesktopNavbar />
       <MobileNavbar />
-    </div>
+    </>
   );
 }
 
@@ -29,49 +29,52 @@ function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="block border-separate bg-background md:hidden">
-      <nav className="container flex items-center justify-between px-8">
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant={"ghost"} size={"icon"}>
-              <Menu />
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="w-full sm:w-[540px]" side="left">
-            <SheetTitle>
-              <Logo />
-            </SheetTitle>
-            <div className="flex flex-col gap-1 pt-4">
-              {items.map((item) => (
-                <NavbarItem
-                  key={item.label}
-                  link={item.link}
-                  label={item.label}
-                  onClick={() => setIsOpen(false)} 
-                />
-              ))}
-            </div>
-          </SheetContent>
-        </Sheet>
-        <div className="flex h-[80px] min-h-[80px] items-center gap-x-4">
+    <div className="sticky top-0 z-50 w-full border-b bg-background md:hidden">
+      <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-4">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              className="w-screen h-screen flex flex-col items-center justify-center"
+            >
+              <SheetTitle className="mb-6">
+                <Logo />
+              </SheetTitle>
+              <div className="flex flex-col items-center gap-6">
+                {items.map((item) => (
+                  <NavbarItem
+                    key={item.label}
+                    link={item.link}
+                    label={item.label}
+                    onClick={() => setIsOpen(false)}
+                  />
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
           <LogoMobile />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <ThemeSwitcherBtn />
           <UserButton afterSignOutUrl="/sign-in" />
         </div>
-      </nav>
+      </div>
     </div>
   );
 }
 
 function DesktopNavbar() {
   return (
-    <div className="hidden border-separate border-b border-background md:block">
-      <nav className="container flex items-center justify-between px-8">
-        <div className="flex h-[80px] min-h-[60px] items-center gap-x-4">
+    <div className="sticky top-0 z-50 hidden w-full border-b bg-background md:block">
+      <div className="mx-auto flex h-16 w-full max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-8">
           <Logo />
-          <div className="flex h-full">
+          <nav className="flex items-center gap-6">
             {items.map((item) => (
               <NavbarItem
                 key={item.label}
@@ -79,13 +82,13 @@ function DesktopNavbar() {
                 link={item.link}
               />
             ))}
-          </div>
+          </nav>
         </div>
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-4">
           <ThemeSwitcherBtn />
           <UserButton afterSignOutUrl="/sign-in" />
         </div>
-      </nav>
+      </div>
     </div>
   );
 }
@@ -103,21 +106,18 @@ function NavbarItem({
   const isActive = pathname === link;
 
   return (
-    <div className="flex relative items-center">
+    <div className="relative">
       <Link
         href={link}
         className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "w-full justify-center text-lg text-muted-foreground hover:text-foreground",
-          isActive && "text-foreground"
+          "text-sm font-medium transition-colors hover:text-primary no-underline",
+          isActive ? "text-foreground font-bold" : "text-muted-foreground"
         )}
         onClick={onClick}
       >
         {label}
+        {isActive && <div className="mt-1 h-0.5 w-full bg-primary" />}
       </Link>
-      {isActive && (
-        <div className="absolute -bottom-[2px] left-1/2 hidden h-[2px] w-[80%] -translate-x-1/2 rounded-xl bg-foreground md:block" />
-      )}
     </div>
   );
 }
