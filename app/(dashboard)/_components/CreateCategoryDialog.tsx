@@ -3,8 +3,10 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -16,6 +18,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { TransactionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -24,10 +27,9 @@ import {
   CreateCategorySchemaType,
 } from "@/schema/categories";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleOff, PlusSquare } from "lucide-react";
-import React, { useState } from "react";
+import { CircleOff, Loader2, PlusSquare } from "lucide-react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
-import CategoryPicker from "./CategoryPicker";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -36,19 +38,68 @@ import {
 } from "@/components/ui/popover";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreateCategory } from "../_actions/categories";
+import { Category } from "@prisma/client";
+import { toast } from "sonner";
+import { useTheme } from "next-themes";
 
 interface Props {
   type: TransactionType;
+  successCallback: (category: Category) => void;
 }
 
-function CreateCategoryDialog({ type }: Props) {
+function CreateCategoryDialog({ type, successCallback }: Props) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
     defaultValues: {
       type,
+      name: "",
+      icon: "",
     },
   });
+
+  const queryClient = useQueryClient();
+  const theme = useTheme();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: CreateCategory,
+    onSuccess: async (data: Category) => {
+      form.reset({
+        name: "",
+        icon: "",
+        type,
+      });
+
+      toast.success(`Category ${data.name} created successfully`, {
+        id: "create-category",
+      });
+
+      successCallback(data);
+
+      await queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+
+      setOpen((prev) => !prev);
+    },
+    onError: () => {
+      toast.error("Something went wrong", {
+        id: "create-category",
+      });
+    },
+  });
+
+  const onSubmit = useCallback(
+    (values: CreateCategorySchemaType) => {
+      toast.loading("Creating category...", {
+        id: "create-category",
+      });
+      mutate(values);
+    },
+    [mutate]
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -68,7 +119,7 @@ function CreateCategoryDialog({ type }: Props) {
             <span
               className={cn(
                 "m-1",
-                type === "income" ? "!text-emerald-500" : "!text-red-500"
+                type === "income" ? "text-emerald-500" : "text-red-500"
               )}
             >
               {type}
@@ -80,7 +131,7 @@ function CreateCategoryDialog({ type }: Props) {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="name"
@@ -88,9 +139,10 @@ function CreateCategoryDialog({ type }: Props) {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input defaultValue={""} {...field} />
+                    <Input placeholder="Category" {...field} />
                   </FormControl>
                   <FormDescription>Name of the Category</FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -108,7 +160,7 @@ function CreateCategoryDialog({ type }: Props) {
                           variant={"outline"}
                           className="h-[100px] w-full"
                         >
-                          {form.watch("icon") ? (
+                          {field.value ? (
                             <div className="flex flex-col items-center gap-2">
                               <span className="text-5xl" role="img">
                                 {field.value}
@@ -127,25 +179,45 @@ function CreateCategoryDialog({ type }: Props) {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full h-auto max-h-[50vh] scale-75 origin-top">
+                      <PopoverContent className="w-full h-auto max-h-[65vh] overflow-auto scale-80">
 
                           <Picker
                             data={data}
-                            onEmojiSelect={(emoji: {native: string}) => {
+                            theme={theme.resolvedTheme}
+                            onEmojiSelect={(emoji: { native: string }) => {
                               field.onChange(emoji.native);
                             }}
                           />
+
                       </PopoverContent>
                     </Popover>
                   </FormControl>
                   <FormDescription>
                     This is how your category will appear in the app
                   </FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </form>
         </Form>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant={"secondary"}
+              onClick={() => {
+                form.reset();
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+            {!isPending && "Create"}
+            {isPending && <Loader2 className="animate-spin" />}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
