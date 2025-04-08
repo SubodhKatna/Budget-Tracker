@@ -72,7 +72,7 @@ function CategoriesCard({
   );
 
   return (
-    <Card className="h-80 w-full bg-muted/50">
+    <Card className="h-60 w-full bg-muted/50">
       <CardHeader>
         <CardTitle className="text-muted-foreground">
           {type === "income" ? "Incomes" : "Expenses"} by category
