@@ -34,19 +34,16 @@ function CategoriesStats({ userSettings, from, to }: Props) {
 
   return (
     <div className="flex w-full flex-col space-y-4 px-4 py-2 md:flex-row md:space-x-4 md:space-y-0">
-      <SkeletonWrapper 
-        isLoading={statsQuery.isFetching} 
-      >
-        <CategoriesCard
-          formatter={formatter}
-          type="income"
-          data={statsQuery.data || []}
-        />
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+
+          <CategoriesCard
+            formatter={formatter}
+            type="income"
+            data={statsQuery.data || []}
+          />
       </SkeletonWrapper>
 
-      <SkeletonWrapper 
-        isLoading={statsQuery.isFetching} 
-      >
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <CategoriesCard
           formatter={formatter}
           type="expense"
@@ -75,19 +72,20 @@ function CategoriesCard({
   );
 
   return (
-    <Card className="h-80 w-full">
+    <Card className="h-80 w-full bg-muted/50">
       <CardHeader>
         <CardTitle className="text-muted-foreground">
           {type === "income" ? "Incomes" : "Expenses"} by category
         </CardTitle>
       </CardHeader>
-      
+
       <div className="h-[calc(100%-3.5rem)] px-4 pb-4">
         {filteredData.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
             <p className="text-sm font-medium">No data available</p>
             <p className="text-xs text-muted-foreground">
-              Try selecting a different period or add new {type === "income" ? "incomes" : "expenses"}
+              Try selecting a different period or add new{" "}
+              {type === "income" ? "incomes" : "expenses"}
             </p>
           </div>
         ) : (
