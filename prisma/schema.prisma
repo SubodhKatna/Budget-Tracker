@@ -10,8 +10,7 @@ generator client {
 
 datasource db {
   provider  = "sqlite"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  url       =  "file:./dev.db"
 }
 
 model UserSettings {
@@ -65,3 +64,4 @@ model YearHistory {
 
   @@id([month, year, userId])
 }
+
