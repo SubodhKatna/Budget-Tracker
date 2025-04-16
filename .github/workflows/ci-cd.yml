@@ -31,6 +31,11 @@ jobs:
 
       - name: Verify Commit Message
         run: npx commitlint --from=HEAD~1 --to=HEAD --verbose
+      
+      - name: Copy env files for build
+        run: |
+          cp .env .env.production
+          cp .env.local .env.local.production || true
 
       - name: Build Docker Image
         run: docker build -t budget-tracker-app:1.0 .
