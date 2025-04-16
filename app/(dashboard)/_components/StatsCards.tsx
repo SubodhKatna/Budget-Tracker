@@ -119,6 +119,7 @@ function StatCard({
   return (
     <div className="flex items-start gap-4 w-full p-4">
       <div className="flex items-center justify-center h-12 w-12 rounded-lg">{icon}</div>
+      {/* demo comment */}
       <div className="flex flex-col">
         <p className="text-sm text-muted-foreground">{title}</p>
         <CountUp
