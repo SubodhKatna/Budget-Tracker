@@ -22,7 +22,3 @@ services:
     networks:
       - default
 
-networks:
-  default:
-    external:
-      name: host
