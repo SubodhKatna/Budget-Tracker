@@ -1,16 +1,16 @@
-import { getHistoryPeriodsResponseType } from "@/app/api/history-periods/route";
-import SkeletonWrapper from "@/components/SkeletonWrapper";
+import { getHistoryPeriodsResponseType } from '@/app/api/history-periods/route';
+import SkeletonWrapper from '@/components/SkeletonWrapper';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Period, Timeframe } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
-import React from "react";
+} from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Period, Timeframe } from '@/lib/types';
+import { useQuery } from '@tanstack/react-query';
+import React from 'react';
 
 interface Props {
   period: Period;
@@ -19,23 +19,15 @@ interface Props {
   setTimeframe: (Timeframe: Timeframe) => void;
 }
 
-function HistoryPeriodSelector({
-  period,
-  setPeriod,
-  timeframe,
-  setTimeframe,
-}: Props) {
+function HistoryPeriodSelector({ period, setPeriod, timeframe, setTimeframe }: Props) {
   const hstoryPeriods = useQuery<getHistoryPeriodsResponseType>({
-    queryKey: ["overvview", "history", "periods"],
+    queryKey: ['overvview', 'history', 'periods'],
     queryFn: () => fetch(`/api/history-periods`).then((res) => res.json()),
   });
   return (
     <div className="flex flex-wrap items-center gap-4 bg-muted/50">
       <SkeletonWrapper isLoading={hstoryPeriods.isFetching} fullwidth={false}>
-        <Tabs
-          value={timeframe}
-          onValueChange={(value) => setTimeframe(value as Timeframe)}
-        >
+        <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
           <TabsList>
             <TabsTrigger value="year">Year</TabsTrigger>
             <TabsTrigger value="month">Month</TabsTrigger>
@@ -44,17 +36,10 @@ function HistoryPeriodSelector({
       </SkeletonWrapper>
       <div className="flex flex-wrap items-center gap-2">
         <SkeletonWrapper isLoading={hstoryPeriods.isFetching} fullwidth={false}>
-          <YearSelector
-            period={period}
-            setPeriod={setPeriod}
-            years={hstoryPeriods.data || []}
-          />
+          <YearSelector period={period} setPeriod={setPeriod} years={hstoryPeriods.data || []} />
         </SkeletonWrapper>
-        {timeframe === "month" && (
-          <SkeletonWrapper
-            isLoading={hstoryPeriods.isFetching}
-            fullwidth={false}
-          >
+        {timeframe === 'month' && (
+          <SkeletonWrapper isLoading={hstoryPeriods.isFetching} fullwidth={false}>
             <MonthSelector period={period} setPeriod={setPeriod} />
           </SkeletonWrapper>
         )}
@@ -87,7 +72,9 @@ function MonthSelector({
       </SelectTrigger>
       <SelectContent>
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => {
-          const monthStr = new Date(period.year, month, 1).toLocaleString("default",{month: "long"});
+          const monthStr = new Date(period.year, month, 1).toLocaleString('default', {
+            month: 'long',
+          });
           return (
             <SelectItem key={month} value={month.toString()}>
               {monthStr}

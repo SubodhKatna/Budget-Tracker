@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   AlertDialog,
@@ -9,11 +9,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React from "react";
-import { toast } from "sonner";
-import { DeleteTransaction } from "../_actions/deleteTransaction";
+} from '@/components/ui/alert-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { toast } from 'sonner';
+import { DeleteTransaction } from '../_actions/deleteTransaction';
 
 interface Props {
   open: boolean;
@@ -22,21 +22,21 @@ interface Props {
   onSuccess?: () => void;
 }
 
-function DeleteTransactionDialog({ open, setOpen, transactionId, }: Props) {
+function DeleteTransactionDialog({ open, setOpen, transactionId }: Props) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: DeleteTransaction,
     onSuccess: async () => {
-      toast.success("Transactions deleted successfully", {
+      toast.success('Transactions deleted successfully', {
         id: transactionId,
       });
       await queryClient.invalidateQueries({
-        queryKey: ["transaction"],
+        queryKey: ['transaction'],
       });
     },
     onError: () => {
-      toast.error("Something went wrong", {
+      toast.error('Something went wrong', {
         id: transactionId,
       });
     },
@@ -48,15 +48,14 @@ function DeleteTransactionDialog({ open, setOpen, transactionId, }: Props) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            transaction
+            This action cannot be undone. This will permanently delete your transaction
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              toast.loading("Deleting transaction...", {
+              toast.loading('Deleting transaction...', {
                 id: transactionId,
               });
               deleteMutation.mutate(transactionId);

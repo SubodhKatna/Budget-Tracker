@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { GetBalanceeStatsResponseType } from "@/app/api/stats/balance/route";
-import SkeletonWrapper from "@/components/SkeletonWrapper";
-import { DateToUTCDate, GetFormatterForCurrency } from "@/lib/helper";
-import { UserSettings } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
-import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
-import React, { useMemo, ReactNode, useCallback } from "react";
-import CountUp from "react-countup";
+import { GetBalanceeStatsResponseType } from '@/app/api/stats/balance/route';
+import SkeletonWrapper from '@/components/SkeletonWrapper';
+import { DateToUTCDate, GetFormatterForCurrency } from '@/lib/helper';
+import { UserSettings } from '@prisma/client';
+import { useQuery } from '@tanstack/react-query';
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import React, { useMemo, ReactNode, useCallback } from 'react';
+import CountUp from 'react-countup';
 
 interface Props {
   from: Date;
@@ -17,7 +17,7 @@ interface Props {
 
 function StatsCards({ from, to, userSettings }: Props) {
   const statsQuery = useQuery<GetBalanceeStatsResponseType>({
-    queryKey: ["overview", "stats", from, to],
+    queryKey: ['overview', 'stats', from, to],
     queryFn: () =>
       fetch(
         `/api/stats/balance?from=${DateToUTCDate(
@@ -39,7 +39,7 @@ function StatsCards({ from, to, userSettings }: Props) {
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <div
           className={`w-full rounded-xl transition-colors duration-300 ${
-            statsQuery.isFetching ? "" : "bg-muted/50"
+            statsQuery.isFetching ? '' : 'bg-muted/50'
           }`}
         >
           <StatCard
@@ -58,7 +58,7 @@ function StatsCards({ from, to, userSettings }: Props) {
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <div
           className={`w-full rounded-xl transition-colors duration-300 ${
-            statsQuery.isFetching ? "" : "bg-muted/50"
+            statsQuery.isFetching ? '' : 'bg-muted/50'
           }`}
         >
           <StatCard
@@ -77,7 +77,7 @@ function StatsCards({ from, to, userSettings }: Props) {
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
         <div
           className={`w-full rounded-xl transition-colors duration-300 ${
-            statsQuery.isFetching ? "" : "bg-muted/50"
+            statsQuery.isFetching ? '' : 'bg-muted/50'
           }`}
         >
           <StatCard
@@ -119,9 +119,7 @@ function StatCard({
   return (
     <div className="flex items-start gap-4 w-full p-4">
       {/* Icon */}
-      <div className="flex items-center justify-center h-12 w-12 rounded-lg">
-        {icon}
-      </div>
+      <div className="flex items-center justify-center h-12 w-12 rounded-lg">{icon}</div>
 
       {/* Title and value aligned with icon top */}
       <div className="flex flex-col">

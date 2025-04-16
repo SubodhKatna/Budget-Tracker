@@ -1,13 +1,13 @@
-"use server";
+'use server';
 
-import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { prisma } from '@/lib/prisma';
+import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 export async function DeleteTransaction(id: string) {
   const user = await currentUser();
   if (!user) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   const transaction = await prisma.transaction.findUnique({
@@ -17,7 +17,7 @@ export async function DeleteTransaction(id: string) {
     },
   });
   if (!transaction) {
-    throw new Error("bad request");
+    throw new Error('bad request');
   }
   await prisma.$transaction([
     prisma.transaction.delete({
@@ -37,12 +37,12 @@ export async function DeleteTransaction(id: string) {
         },
       },
       data: {
-        ...(transaction.type === "expense" && {
+        ...(transaction.type === 'expense' && {
           expense: {
             decrement: transaction.amount,
           },
         }),
-        ...(transaction.type === "income" && {
+        ...(transaction.type === 'income' && {
           income: {
             decrement: transaction.amount,
           },
@@ -58,12 +58,12 @@ export async function DeleteTransaction(id: string) {
         },
       },
       data: {
-        ...(transaction.type === "expense" && {
+        ...(transaction.type === 'expense' && {
           expense: {
             decrement: transaction.amount,
           },
         }),
-        ...(transaction.type === "income" && {
+        ...(transaction.type === 'income' && {
           income: {
             decrement: transaction.amount,
           },

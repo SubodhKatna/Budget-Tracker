@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -8,16 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { TransactionType } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import {
-  CreateTransactionSchema,
-  CreateTransactoinSchemaType,
-} from "@/schema/transaction";
-import { ReactNode, useCallback, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+} from '@/components/ui/dialog';
+import { TransactionType } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { CreateTransactionSchema, CreateTransactoinSchemaType } from '@/schema/transaction';
+import { ReactNode, useCallback, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -26,24 +23,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import CategoryPicker from "./CategoryPicker";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreateTransaction } from "../_actions/transactions";
-import { toast } from "sonner";
-import { DateToUTCDate } from "@/lib/helper";
-
-const unusedVariable = "This variable is not used";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import CategoryPicker from './CategoryPicker';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CreateTransaction } from '../_actions/transactions';
+import { toast } from 'sonner';
+import { DateToUTCDate } from '@/lib/helper';
 
 interface Props {
   trigger: ReactNode;
@@ -57,7 +48,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
       type,
       date: new Date(),
       amount: 0,
-      description: "",
+      description: '',
       category: undefined,
     },
   });
@@ -65,7 +56,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
   const [open, setOpen] = useState(false);
   const handleCategoryChange = useCallback(
     (value: string) => {
-      form.setValue("category", value);
+      form.setValue('category', value);
     },
     [form]
   );
@@ -75,35 +66,35 @@ function CreateTransactionDialog({ trigger, type }: Props) {
   const { mutate, isPending } = useMutation({
     mutationFn: CreateTransaction,
     onSuccess: () => {
-      toast.dismiss("create-transaction"); // Dismiss the loading toast
-      toast.success("Transaction created successfully", {
-        id: "create-transaction-success",
+      toast.dismiss('create-transaction'); // Dismiss the loading toast
+      toast.success('Transaction created successfully', {
+        id: 'create-transaction-success',
       });
 
       form.reset({
         type,
-        description: "",
+        description: '',
         amount: 0,
         date: new Date(),
         category: undefined,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["overview"],
+        queryKey: ['overview'],
       });
 
       setOpen(false);
     },
     onError: () => {
-      toast.dismiss("create-transaction"); // Dismiss the loading toast
-      toast.error("Failed to create transaction");
+      toast.dismiss('create-transaction'); // Dismiss the loading toast
+      toast.error('Failed to create transaction');
     },
   });
 
   const onSubmit = useCallback(
     (values: CreateTransactoinSchemaType) => {
-      toast.loading("Creating transaction...", {
-        id: "create-transaction",
+      toast.loading('Creating transaction...', {
+        id: 'create-transaction',
       });
 
       mutate({
@@ -120,15 +111,10 @@ function CreateTransactionDialog({ trigger, type }: Props) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Create a new{" "}
-            <span
-              className={cn(
-                "m-1",
-                type === "income" ? "text-emerald-500" : "text-red-500"
-              )}
-            >
+            Create a new{' '}
+            <span className={cn('m-1', type === 'income' ? 'text-emerald-500' : 'text-red-500')}>
               {type}
-            </span>{" "}
+            </span>{' '}
             transaction
           </DialogTitle>
         </DialogHeader>
@@ -143,9 +129,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Transaction description (optional)
-                  </FormDescription>
+                  <FormDescription>Transaction description (optional)</FormDescription>
                 </FormItem>
               )}
             />
@@ -159,9 +143,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Transaction amount (required)
-                  </FormDescription>
+                  <FormDescription>Transaction amount (required)</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -171,18 +153,13 @@ function CreateTransactionDialog({ trigger, type }: Props) {
               <FormField
                 control={form.control}
                 name="category"
-                render={({  }) => (
+                render={({}) => (
                   <FormItem className="flex-1">
                     <FormLabel>Category</FormLabel>
                     <FormControl>
-                      <CategoryPicker
-                        type={type}
-                        onChange={handleCategoryChange}
-                      />
+                      <CategoryPicker type={type} onChange={handleCategoryChange} />
                     </FormControl>
-                    <FormDescription>
-                      Select a category for this transaction
-                    </FormDescription>
+                    <FormDescription>Select a category for this transaction</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -198,17 +175,13 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant={"outline"}
+                            variant={'outline'}
                             className={cn(
-                              "w-[200px] pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              'w-[200px] pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground'
                             )}
                           >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
+                            {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
@@ -222,9 +195,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormDescription>
-                      Select a date for this transaction
-                    </FormDescription>
+                    <FormDescription>Select a date for this transaction</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -235,7 +206,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
               <DialogClose asChild>
                 <Button
                   type="button"
-                  variant={"secondary"}
+                  variant={'secondary'}
                   onClick={() => {
                     form.reset();
                   }}
@@ -244,7 +215,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                 </Button>
               </DialogClose>
               <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
-                {!isPending && "Create"}
+                {!isPending && 'Create'}
                 {isPending && <Loader2 className="animate-spin" />}
               </Button>
             </DialogFooter>

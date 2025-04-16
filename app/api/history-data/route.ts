@@ -1,12 +1,12 @@
-import { prisma } from "@/lib/prisma";
-import { Period, Timeframe } from "@/lib/types";
-import { currentUser } from "@clerk/nextjs/server";
-import { getDaysInMonth } from "date-fns";
-import { redirect } from "next/navigation";
-import { z } from "zod";
+import { prisma } from '@/lib/prisma';
+import { Period, Timeframe } from '@/lib/types';
+import { currentUser } from '@clerk/nextjs/server';
+import { getDaysInMonth } from 'date-fns';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
 
 const getHistoryDataSchema = z.object({
-  timeframe: z.enum(["month", "year"]),
+  timeframe: z.enum(['month', 'year']),
   month: z.coerce.number().min(0).max(11).default(0),
   year: z.coerce.number().min(2000).max(3000),
 });
@@ -14,13 +14,13 @@ const getHistoryDataSchema = z.object({
 export async function GET(request: Request) {
   const user = await currentUser();
   if (!user) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   const { searchParams } = new URL(request.url);
-  const timeframe = searchParams.get("timeframe");
-  const year = searchParams.get("year");
-  const month = searchParams.get("month");
+  const timeframe = searchParams.get('timeframe');
+  const year = searchParams.get('year');
+  const month = searchParams.get('month');
 
   const querParams = getHistoryDataSchema.safeParse({
     timeframe,
@@ -43,15 +43,11 @@ export async function GET(request: Request) {
 
 export type getHistoryDataType = Awaited<ReturnType<typeof getHistoryData>>;
 
-async function getHistoryData(
-  userId: string,
-  timeframe: Timeframe,
-  period: Period
-) {
+async function getHistoryData(userId: string, timeframe: Timeframe, period: Period) {
   switch (timeframe) {
-    case "year":
+    case 'year':
       return await getYearHistoryData(userId, period.year);
-    case "month":
+    case 'month':
       return await getMonthHistoryData(userId, period.year, period.month ?? 0);
   }
 }
@@ -65,91 +61,91 @@ type HistoryData = {
 };
 
 async function getYearHistoryData(userId: string, year: number) {
-    const result = await prisma.yearHistory.groupBy({
-      by: ["month"],
-      where: {
-        userId,
-        year,
+  const result = await prisma.yearHistory.groupBy({
+    by: ['month'],
+    where: {
+      userId,
+      year,
+    },
+    _sum: {
+      expense: true,
+      income: true,
+    },
+    orderBy: [
+      {
+        month: 'asc',
       },
-      _sum: {
-        expense: true,
-        income: true,
-      },
-      orderBy: [
-        {
-          month: "asc",
-        },
-      ],
-    });
-  
-    if (!result || result.length === 0) return [];
-  
-    const history: HistoryData[] = [];
-  
-    for (let i = 0; i < 12; i++) {
-      let expense = 0;
-      let income = 0;
-  
-      const monthData = result.find((row) => row.month === i);
-  
-      if (monthData) {
-        expense = monthData._sum.expense || 0;
-        income = monthData._sum.income || 0;
-      }
-  
-      history.push({
-        year,
-        month: i,
-        expense,
-        income,
-      });
+    ],
+  });
+
+  if (!result || result.length === 0) return [];
+
+  const history: HistoryData[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    let expense = 0;
+    let income = 0;
+
+    const monthData = result.find((row) => row.month === i);
+
+    if (monthData) {
+      expense = monthData._sum.expense || 0;
+      income = monthData._sum.income || 0;
     }
-  
-    return history;
-  }
-  
-  async function getMonthHistoryData(userId: string, year: number, month: number) {
-    const result = await prisma.monthHistory.groupBy({
-      by: ["day"],
-      where: {
-        userId,
-        year,
-        month,
-      },
-      _sum: {
-        expense: true,
-        income: true,
-      },
-      orderBy: [
-        {
-          day: "asc",
-        },
-      ],
+
+    history.push({
+      year,
+      month: i,
+      expense,
+      income,
     });
-  
-    if (!result || result.length === 0) return [];
-  
-    const history: HistoryData[] = [];
-    const daysInMonth = getDaysInMonth(new Date(year, month));
-  
-    for (let i = 1; i <= daysInMonth; i++) {
-      let expense = 0;
-      let income = 0;
-  
-      const dayData = result.find((row) => row.day === i);
-      if (dayData) {
-        expense = dayData._sum.expense || 0;
-        income = dayData._sum.income || 0;
-      }
-  
-      history.push({
-        year,
-        month,
-        day: i,
-        expense,
-        income,
-      });
-    }
-  
-    return history;
   }
+
+  return history;
+}
+
+async function getMonthHistoryData(userId: string, year: number, month: number) {
+  const result = await prisma.monthHistory.groupBy({
+    by: ['day'],
+    where: {
+      userId,
+      year,
+      month,
+    },
+    _sum: {
+      expense: true,
+      income: true,
+    },
+    orderBy: [
+      {
+        day: 'asc',
+      },
+    ],
+  });
+
+  if (!result || result.length === 0) return [];
+
+  const history: HistoryData[] = [];
+  const daysInMonth = getDaysInMonth(new Date(year, month));
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    let expense = 0;
+    let income = 0;
+
+    const dayData = result.find((row) => row.day === i);
+    if (dayData) {
+      expense = dayData._sum.expense || 0;
+      income = dayData._sum.income || 0;
+    }
+
+    history.push({
+      year,
+      month,
+      day: i,
+      expense,
+      income,
+    });
+  }
+
+  return history;
+}

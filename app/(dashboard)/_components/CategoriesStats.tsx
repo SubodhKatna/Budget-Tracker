@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { getCategoriesStatsResponseType } from "@/app/api/stats/categories/route";
-import SkeletonWrapper from "@/components/SkeletonWrapper";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { DateToUTCDate, GetFormatterForCurrency } from "@/lib/helper";
-import { TransactionType } from "@/lib/types";
-import { UserSettings } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
-import React, { useMemo } from "react";
+import { getCategoriesStatsResponseType } from '@/app/api/stats/categories/route';
+import SkeletonWrapper from '@/components/SkeletonWrapper';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { DateToUTCDate, GetFormatterForCurrency } from '@/lib/helper';
+import { TransactionType } from '@/lib/types';
+import { UserSettings } from '@prisma/client';
+import { useQuery } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
 
 interface Props {
   userSettings: UserSettings;
@@ -19,13 +19,11 @@ interface Props {
 
 function CategoriesStats({ userSettings, from, to }: Props) {
   const statsQuery = useQuery<getCategoriesStatsResponseType>({
-    queryKey: ["overview", "stats", "categories", from, to],
+    queryKey: ['overview', 'stats', 'categories', from, to],
     queryFn: () =>
-      fetch(
-        `/api/stats/categories?from=${DateToUTCDate(from)}&to=${DateToUTCDate(
-          to
-        )}`
-      ).then((res) => res.json()),
+      fetch(`/api/stats/categories?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}`).then(
+        (res) => res.json()
+      ),
   });
 
   const formatter = useMemo(() => {
@@ -35,20 +33,11 @@ function CategoriesStats({ userSettings, from, to }: Props) {
   return (
     <div className="flex w-full flex-col space-y-4 px-4 py-2 md:flex-row md:space-x-4 md:space-y-0">
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
-
-          <CategoriesCard
-            formatter={formatter}
-            type="income"
-            data={statsQuery.data || []}
-          />
+        <CategoriesCard formatter={formatter} type="income" data={statsQuery.data || []} />
       </SkeletonWrapper>
 
       <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        <CategoriesCard
-          formatter={formatter}
-          type="expense"
-          data={statsQuery.data || []}
-        />
+        <CategoriesCard formatter={formatter} type="expense" data={statsQuery.data || []} />
       </SkeletonWrapper>
     </div>
   );
@@ -66,16 +55,13 @@ function CategoriesCard({
   data: getCategoriesStatsResponseType;
 }) {
   const filteredData = data.filter((el) => el.type === type);
-  const total = filteredData.reduce(
-    (acc, el) => acc + (el._sum?.amount || 0),
-    0
-  );
+  const total = filteredData.reduce((acc, el) => acc + (el._sum?.amount || 0), 0);
 
   return (
     <Card className="h-60 w-full bg-muted/50">
       <CardHeader>
         <CardTitle className="text-muted-foreground">
-          {type === "income" ? "Incomes" : "Expenses"} by category
+          {type === 'income' ? 'Incomes' : 'Expenses'} by category
         </CardTitle>
       </CardHeader>
 
@@ -84,8 +70,8 @@ function CategoriesCard({
           <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
             <p className="text-sm font-medium">No data available</p>
             <p className="text-xs text-muted-foreground">
-              Try selecting a different period or add new{" "}
-              {type === "income" ? "incomes" : "expenses"}
+              Try selecting a different period or add new{' '}
+              {type === 'income' ? 'incomes' : 'expenses'}
             </p>
           </div>
         ) : (
@@ -105,15 +91,11 @@ function CategoriesCard({
                           ({percentage.toFixed(0)}%)
                         </span>
                       </div>
-                      <span className="text-sm">
-                        {formatter.format(amount)}
-                      </span>
+                      <span className="text-sm">{formatter.format(amount)}</span>
                     </div>
                     <Progress
                       value={percentage}
-                      indicator={
-                        type === "income" ? "bg-emerald-500" : "bg-red-500"
-                      }
+                      indicator={type === 'income' ? 'bg-emerald-500' : 'bg-red-500'}
                     />
                   </div>
                 );

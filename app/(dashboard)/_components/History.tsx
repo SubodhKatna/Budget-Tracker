@@ -1,24 +1,16 @@
-"use client";
+'use client';
 
-import React, { useMemo, useState } from "react";
-import { UserSettings } from "@prisma/client";
-import { Period, Timeframe } from "@/lib/types";
-import { GetFormatterForCurrency } from "@/lib/helper";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import HistoryPeriodSelector from "./HistoryPeriodSelector";
-import { useQuery } from "@tanstack/react-query";
-import SkeletonWrapper from "@/components/SkeletonWrapper";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { cn } from "@/lib/utils";
+import React, { useMemo, useState } from 'react';
+import { UserSettings } from '@prisma/client';
+import { Period, Timeframe } from '@/lib/types';
+import { GetFormatterForCurrency } from '@/lib/helper';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import HistoryPeriodSelector from './HistoryPeriodSelector';
+import { useQuery } from '@tanstack/react-query';
+import SkeletonWrapper from '@/components/SkeletonWrapper';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { cn } from '@/lib/utils';
 
 interface HistoryDataItem {
   income: number;
@@ -30,7 +22,7 @@ interface HistoryDataItem {
 }
 
 function History({ userSettings }: { userSettings: UserSettings }) {
-  const [timeframe, setTimeframe] = useState<Timeframe>("month");
+  const [timeframe, setTimeframe] = useState<Timeframe>('month');
   const [period, setPeriod] = useState<Period>({
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
@@ -41,23 +33,23 @@ function History({ userSettings }: { userSettings: UserSettings }) {
   }, [userSettings.currency]);
 
   const { data, isLoading, isError } = useQuery<HistoryDataItem[]>({
-    queryKey: ["overview", "history", timeframe, period],
+    queryKey: ['overview', 'history', timeframe, period],
     queryFn: async () => {
       const response = await fetch(
         `/api/history-data?timeframe=${timeframe}&year=${period.year}&month=${period.month}`
       );
-      if (!response.ok) throw new Error("Failed to fetch history data");
+      if (!response.ok) throw new Error('Failed to fetch history data');
       return response.json();
     },
   });
 
   const chartData = useMemo(() => {
     if (!data) return [];
-    return data.map(item => ({
+    return data.map((item) => ({
       ...item,
       income: item.income || 0,
       expense: item.expense || 0,
-      date: item.date || new Date(item.year, item.month, item.day || 1).toISOString()
+      date: item.date || new Date(item.year, item.month, item.day || 1).toISOString(),
     }));
   }, [data]);
 
@@ -93,46 +85,28 @@ function History({ userSettings }: { userSettings: UserSettings }) {
           <SkeletonWrapper isLoading={isLoading}>
             {dataAvailable ? (
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
-                >
+                <BarChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} vertical={false} />
                   <XAxis
                     dataKey={(data) => {
                       const date = new Date(data.date ?? new Date());
-                      if (timeframe === "year") {
-                        return date.toLocaleDateString("default", { month: "short" });
+                      if (timeframe === 'year') {
+                        return date.toLocaleDateString('default', { month: 'short' });
                       }
-                      return date.toLocaleDateString("default", { day: "numeric" });
+                      return date.toLocaleDateString('default', { day: 'numeric' });
                     }}
                     stroke="#888888"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip
                     content={<CustomTooltip formatter={formatter} timeframe={timeframe} />}
-                    cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
                   />
-                  <Bar
-                    dataKey="income"
-                    name="Income"
-                    fill="#10b981"
-                    radius={4}
-                  />
-                  <Bar
-                    dataKey="expense"
-                    name="Expense"
-                    fill="#ef4444"
-                    radius={4}
-                  />
+                  <Bar dataKey="income" name="Income" fill="#10b981" radius={4} />
+                  <Bar dataKey="expense" name="Expense" fill="#ef4444" radius={4} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -165,23 +139,21 @@ function CustomTooltip({ active, payload, formatter, timeframe }: CustomTooltipP
   const data = payload[0].payload;
   const hasTransactions = data.income > 0 || data.expense > 0;
   const date = new Date(data.date ?? new Date());
-  
-  let periodName = "";
-  if (timeframe === "year") {
-    periodName = `${date.toLocaleDateString("default", { month: "long" })} ${date.getFullYear()}`;
+
+  let periodName = '';
+  if (timeframe === 'year') {
+    periodName = `${date.toLocaleDateString('default', { month: 'long' })} ${date.getFullYear()}`;
   } else {
-    periodName = date.toLocaleDateString("default", { 
-      day: "numeric", 
-      month: "long", 
-      year: "numeric" 
+    periodName = date.toLocaleDateString('default', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
   }
 
   return (
     <div className="rounded-lg border bg-white p-6 shadow-xl dark:bg-gray-800 min-w-[350px]">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">
-        {periodName}
-      </h3>
+      <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">{periodName}</h3>
       {hasTransactions ? (
         <div className="space-y-3">
           <TooltipRow
@@ -201,10 +173,12 @@ function CustomTooltip({ active, payload, formatter, timeframe }: CustomTooltipP
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 Net Total
               </span>
-              <span className={cn(
-                "text-sm font-bold",
-                data.income - data.expense >= 0 ? "text-emerald-500" : "text-red-500"
-              )}>
+              <span
+                className={cn(
+                  'text-sm font-bold',
+                  data.income - data.expense >= 0 ? 'text-emerald-500' : 'text-red-500'
+                )}
+              >
                 {formatter.format(data.income - data.expense)}
               </span>
             </div>
@@ -230,14 +204,10 @@ function TooltipRow({ label, value, color, formatter }: TooltipRowProps) {
   return (
     <div className="flex items-center justify-between py-1">
       <div className="flex items-center gap-2">
-        <div className={cn("h-4 w-4 rounded-full", color.replace("text", "bg"))} />
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          {label}
-        </span>
+        <div className={cn('h-4 w-4 rounded-full', color.replace('text', 'bg'))} />
+        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</span>
       </div>
-      <span className={cn("text-sm font-bold", color)}>
-        {formatter.format(value)}
-      </span>
+      <span className={cn('text-sm font-bold', color)}>{formatter.format(value)}</span>
     </div>
   );
 }
