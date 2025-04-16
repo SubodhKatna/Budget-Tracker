@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint app --ext .js,.jsx,.ts,.tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "format": "prettier --write 'app/**/*.{js,jsx,ts,tsx,css,html}'"
+    "format": "prettier --write 'app/**/*.{js,jsx,ts,tsx,css,html}'",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.12",
@@ -81,7 +82,7 @@
     "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
-    "husky": "^9.1.7",
+    "husky": "^8.0.3",
     "lint-staged": "^15.5.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
