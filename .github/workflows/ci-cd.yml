@@ -56,5 +56,5 @@ jobs:
           NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL}
           EOF
 
-      - name: Build Docker Image with Compose
-        run: docker-compose build
+      - name: Build Docker Image
+        run: docker build -t budget-tracker-app:1.0 .
