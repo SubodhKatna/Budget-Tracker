@@ -6,7 +6,6 @@ import {
   CreateTransactoinSchemaType,
 } from "@/schema/transaction";
 import { currentUser } from "@clerk/nextjs/server";
-import { CatIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export async function CreateTransaction(form: CreateTransactoinSchemaType) {

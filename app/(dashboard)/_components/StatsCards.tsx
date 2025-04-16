@@ -2,11 +2,10 @@
 
 import { GetBalanceeStatsResponseType } from "@/app/api/stats/balance/route";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
-import { Card } from "@/components/ui/card";
 import { DateToUTCDate, GetFormatterForCurrency } from "@/lib/helper";
 import { UserSettings } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { TrendingDown, TrendingUp, Wallet, Wallet2 } from "lucide-react";
+import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import React, { useMemo, ReactNode, useCallback } from "react";
 import CountUp from "react-countup";
 

@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 import {
   ColumnDef,
-  ColumnFilter,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -24,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { empty } from "@prisma/client/runtime/library";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { DataTableColumnHeader } from "@/components/datatable/ColumnHeader";
 import { cn } from "@/lib/utils";
@@ -50,7 +48,7 @@ interface Props {
   to: Date;
 }
 
-const emptyData: any[] = [];
+const emptyData: TransactionHistoryRow[] = [];
 
 type TransactionHistoryRow = getTransactionHistoryResponseType[0];
 
@@ -150,8 +148,7 @@ function TransactionTable({ from, to }: Props) {
         )}&to=${DateToUTCDate(to)}`
       ).then((res) => res.json()),
   });
-
-  const handleExportCSV = (data: any[]) => {
+  const handleExportCSV = (data: TransactionHistoryRow[]) => {
     const csv = generateCsv(csvConfig)(data);
     download(csvConfig)(csv);
   };

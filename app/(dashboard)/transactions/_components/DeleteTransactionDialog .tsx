@@ -9,7 +9,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -23,7 +22,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-function DeleteTransactionDialog({ open, setOpen, transactionId, onSuccess, }: Props) {
+function DeleteTransactionDialog({ open, setOpen, transactionId, }: Props) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({

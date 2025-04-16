@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import React from "react";
 
 export async function DeleteTransaction(id: string) {
   const user = await currentUser();

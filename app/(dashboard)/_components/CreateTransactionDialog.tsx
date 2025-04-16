@@ -43,6 +43,8 @@ import { CreateTransaction } from "../_actions/transactions";
 import { toast } from "sonner";
 import { DateToUTCDate } from "@/lib/helper";
 
+const unusedVariable = "This variable is not used";
+
 interface Props {
   trigger: ReactNode;
   type: TransactionType;
@@ -169,7 +171,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
               <FormField
                 control={form.control}
                 name="category"
-                render={({ field }) => (
+                render={({  }) => (
                   <FormItem className="flex-1">
                     <FormLabel>Category</FormLabel>
                     <FormControl>

@@ -6,14 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint app --ext .js,.jsx,.ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write 'app/**/*.{js,jsx,ts,tsx,css,html}'"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.12",
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@hookform/resolvers": "^4.1.3",
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.6.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -77,9 +79,26 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
     "postcss": "^8.5.3",
-    "prisma": "^6.5.0",
+    "prettier": "^3.5.3",
+    "prisma": "^6.6.0",
     "tailwindcss": "^4.1.1",
     "typescript": "^5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run lint && npm run format"
+    }
+  },
+  "lint-staged": {
+    "app/**/*.{ts,tsx,js,jsx}": [
+      "npm run lint",
+      "npm run format"
+    ]
   }
 }
