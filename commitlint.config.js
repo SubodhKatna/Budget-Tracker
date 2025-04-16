@@ -18,8 +18,8 @@ module.exports = {
           },
           'header-end-period': ({ header }) => {
             return [
-              !header.trim().endsWith('.'),
-              'Commit message must not end with a period.',
+              header.trim().endsWith('.'),
+              'Commit message must end with a period.',
             ];
           },
         },
