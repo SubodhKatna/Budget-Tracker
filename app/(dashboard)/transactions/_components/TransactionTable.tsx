@@ -56,9 +56,7 @@ const columns: ColumnDef<TransactionHistoryRow>[] = [
   {
     accessorKey: 'category',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
     cell: ({ row }) => (
       <div className="flex gap-2 capitalize">
         {row.original.categoryIcon}
@@ -88,15 +86,13 @@ const columns: ColumnDef<TransactionHistoryRow>[] = [
   {
     accessorKey: 'type',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
     cell: ({ row }) => (
       <div
         className={cn(
           'capitalize rounded-lg text-center p-2',
           row.original.type === 'income' && '!bg-emerald-400/10 !text-emerald-500',
-          row.original.type === 'expense' && '!bg-rose-400/10 !text-rose-500' // Changed to red for expenses
+          row.original.type === 'expense' && '!bg-rose-400/10 !text-rose-500'
         )}
       >
         {row.original.type}
@@ -121,7 +117,7 @@ const columns: ColumnDef<TransactionHistoryRow>[] = [
 
 const csvConfig = mkConfig({
   fieldSeparator: ',',
-  decimalSeparator: ',',
+  decimalSeparator: '.',
   useKeysAsHeaders: true,
 });
 
@@ -135,8 +131,18 @@ function TransactionTable({ from, to }: Props) {
         (res) => res.json()
       ),
   });
+
   const handleExportCSV = (data: TransactionHistoryRow[]) => {
-    const csv = generateCsv(csvConfig)(data);
+    const formatted = data.map((row) => ({
+      category: row.category,
+      categoryIcon: row.categoryIcon,
+      description: row.description,
+      type: row.type,
+      amount: row.amount,
+      formattedAmount: row.formattedAmount,
+      date: new Date(row.date).toISOString(), // <-- FIX: Convert Date to string
+    }));
+    const csv = generateCsv(csvConfig)(formatted);
     download(csvConfig)(csv);
   };
 
@@ -163,8 +169,7 @@ function TransactionTable({ from, to }: Props) {
         label: `${transaction.categoryIcon} ${transaction.category}`,
       });
     });
-    const uniqueCategories = new Set(categoriesMap.values());
-    return Array.from(uniqueCategories);
+    return Array.from(new Set(categoriesMap.values()));
   }, [history.data]);
 
   return (
@@ -193,17 +198,9 @@ function TransactionTable({ from, to }: Props) {
           <Button
             variant={'outline'}
             size={'sm'}
-            className="ml-aut h-8 lg:flex"
+            className="ml-auto h-8 lg:flex"
             onClick={() => {
-              const data = table.getFilteredRowModel().rows.map((row) => ({
-                category: row.original.category,
-                categoryIcon: row.original.categoryIcon,
-                description: row.original.description,
-                type: row.original.type,
-                amount: row.original.amount,
-                formattedAmount: row.original.formattedAmount,
-                date: row.original.date,
-              }));
+              const data = table.getFilteredRowModel().rows.map((row) => row.original);
               handleExportCSV(data);
             }}
           >
@@ -219,22 +216,20 @@ function TransactionTable({ from, to }: Props) {
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -280,7 +275,6 @@ export default TransactionTable;
 function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const handleSuccess = () => {
-    // Reload the page after deletion
     window.location.reload();
   };
   return (
@@ -303,11 +297,9 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2"
-            onSelect={() => {
-              setShowDeleteDialog((prev) => !prev);
-            }}
+            onSelect={() => setShowDeleteDialog(true)}
           >
-            <TrashIcon className="h-4 w-4 text-muted-foreground " />
+            <TrashIcon className="h-4 w-4 text-muted-foreground" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
