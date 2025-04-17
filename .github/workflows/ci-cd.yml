@@ -95,17 +95,17 @@ jobs:
 
       - name: Set Heroku config vars
         run: |
-          heroku config:set --app track-my-cash \
-            DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            DIRECT_URL=${{ secrets.DIRECT_URL }} \
-            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }} \
-            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} \
-            NEXT_PUBLIC_CLERK_SIGN_UP_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }} \
-            NEXT_PUBLIC_CLERK_SIGN_IN_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }} \
-            NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }} \
-            NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+         heroku config:set DATABASE_URL=${{ secrets.DATABASE_URL }} --app track-my-cash
+         heroku config:set DIRECT_URL=${{ secrets.DIRECT_URL }} --app track-my-cash
+         heroku config:set CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }} --app track-my-cash
+         heroku config:set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} --app track-my-cash
+         heroku config:set NEXT_PUBLIC_CLERK_SIGN_UP_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }} --app track-my-cash
+         heroku config:set NEXT_PUBLIC_CLERK_SIGN_IN_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }} --app track-my-cash
+         heroku config:set NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }} --app track-my-cash
+         heroku config:set NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }} --app track-my-cash
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
 
       - name: Push Docker image to Heroku
         run: docker push registry.heroku.com/track-my-cash/web
