@@ -75,7 +75,7 @@ jobs:
   deploy:
     name: Deploy to Heroku
     needs: build-and-test
-    if: (github.ref == 'refs/heads/main' && github.event_name =='push') || github.event_name == 'workflow_dispatch'
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     env:
@@ -94,11 +94,12 @@ jobs:
           persist-credentials: false
 
       - name: Set up Docker Compose
-      run: docker compose version
+        run: docker compose version
 
       - name: Create .env file
         run: |
           cat <<EOF > .env
+          PORT=4000
           DATABASE_URL=${DATABASE_URL}
           DIRECT_URL=${DIRECT_URL}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
@@ -111,24 +112,23 @@ jobs:
 
       - name: Build with Docker Compose
         run: docker compose build
-  
+
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
-  
+
       - name: Log in to Heroku Container Registry
         run: heroku container:login
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  
+
       - name: Tag and Push Docker Image to Heroku
         run: |
           docker tag budget-tracker-app_web:latest registry.heroku.com/track-my-cash/web
           docker push registry.heroku.com/track-my-cash/web
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  
+
       - name: Release the Image to Heroku
         run: heroku container:release web -a track-my-cash
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  
