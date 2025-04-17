@@ -85,7 +85,7 @@ jobs:
 
       - name: Build Docker Image with Docker Compose
         run: |
-            docker-compose up --build -d
+            docker-compose --env-file .env up --build -d
         env:
             DATABASE_URL: ${{ secrets.DATABASE_URL }}
             DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -99,15 +99,16 @@ jobs:
       - name: Log in to the Heroku Container Registery
         run: heroku container:login
         env:
-          HEROKU_API_KEY: $ {{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
-      - name: Tag and Push Docker Image to Herou
-        run: docker tag budget-tracker-app:1.0 registry.heroku.com/budget-tracker-app/web
-          docker push registery.heroku.com/budget-tracker-app/web
+      - name: Tag and Push Docker Image to Heroku
+        run: |
+          docker tag budget-tracker-app:1.0 registry.heroku.com/budget-tracker-app/web
+          docker push registry.heroku.com/budget-tracker-app/web
         env:
-          HEROKU_API_KEY: $ {{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Release the Image to Heroku
         run: heroku container:release web -a budget-tracker-app
         env:
-          HEROKU_API_KEY: $ {{ secrets.HEROKU_API_KEY }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
