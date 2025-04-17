@@ -42,7 +42,7 @@ jobs:
       - name: Run format check
         run: npm run format
 
-      - name: Verify commit message
+      - name: Verify Commit Message
         run: npx commitlint --from=HEAD~1 --to=HEAD --verbose
 
       - name: Build Docker Image
