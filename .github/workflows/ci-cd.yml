@@ -5,7 +5,7 @@ on:
    pull_request:
    workflow_dispatch:
  
-jobs:
+ jobs:
    build-and-test:
      runs-on: ubuntu-latest
  
