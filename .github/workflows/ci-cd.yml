@@ -62,7 +62,7 @@ jobs:
   deploy:
     name: Deploy to Heroku
     needs: build-and-test
-    if: (github.ref == 'refs/heads/main' && github.event_name =='push') || github.event_name == 'woekflow_dispatch'
+    if: (github.ref == 'refs/heads/main' && github.event_name =='push') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -86,9 +86,9 @@ jobs:
         env:
           HEROKU_API_KEY: $ {{ secrets.HEROKU_API_KEY }}
 
-      - name: Tag and Push Docekr Image to Herou
-        run: docker tag budget-tracker-app:1.0 registery.heroku.com/budget-tracker-app/web
-          docker push registery.herokku.com/budget-tracker-app/web
+      - name: Tag and Push Docker Image to Herou
+        run: docker tag budget-tracker-app:1.0 registry.heroku.com/budget-tracker-app/web
+          docker push registery.heroku.com/budget-tracker-app/web
         env:
           HEROKU_API_KEY: $ {{ secrets.HEROKU_API_KEY }}
 
