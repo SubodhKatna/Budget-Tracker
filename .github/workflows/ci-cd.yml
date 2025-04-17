@@ -93,11 +93,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install Docker CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-
       - name: Build Docker Image
         run: |
           docker build \
