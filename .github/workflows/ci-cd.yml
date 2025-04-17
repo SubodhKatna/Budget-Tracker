@@ -116,7 +116,7 @@ jobs:
 
       - name: Build Docker Image with Docker Compose
         run: |
-            docker-compose --env-file $GITHUB_WORKSPACE/.env up --build -d
+            compose --env-file $GITHUB_WORKSPACE/.env up --build -d
 
       - name: Log in to the Heroku Container Registery
         run: heroku container:login
