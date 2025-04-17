@@ -108,6 +108,7 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
+
       - name: Push Docker image to Heroku
         run: docker push registry.heroku.com/track-my-cash/web
 
