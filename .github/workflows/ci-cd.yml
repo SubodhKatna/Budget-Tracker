@@ -83,13 +83,18 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Download .env file from artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: env-file
-
-      - name: Build Docker Image
-        run: docker-compose up --build -d
+      - name: Build Docker Image with Docker Compose
+        run: |
+            docker-compose up --build -d
+        env:
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            DIRECT_URL: ${{ secrets.DIRECT_URL }}
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+            CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+            NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
+            NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
+            NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
+            NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
 
       - name: Log in to the Heroku Container Registery
         run: heroku container:login
