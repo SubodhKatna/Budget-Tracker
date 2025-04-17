@@ -112,7 +112,7 @@ jobs:
 
       - name: Tag and Push Docker Image to Heroku
         run: |
-          docker tag budget-tracker-app:1.0 registry.heroku.com/track-my-cash/web
+          docker tag budget-tracker-app:latest registry.heroku.com/track-my-cash/web
           docker push registry.heroku.com/track-my-cash/web
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
