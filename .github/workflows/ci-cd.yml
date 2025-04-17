@@ -94,17 +94,8 @@ jobs:
           persist-credentials: false
 
       - name: Build Docker Image
-        run: |
-          docker build \
-            --build-arg DATABASE_URL=${DATABASE_URL} \
-            --build-arg DIRECT_URL=${DIRECT_URL} \
-            --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} \
-            --build-arg CLERK_SECRET_KEY=${CLERK_SECRET_KEY} \
-            --build-arg NEXT_PUBLIC_CLERK_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_URL} \
-            --build-arg NEXT_PUBLIC_CLERK_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_URL} \
-            --build-arg NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL} \
-            --build-arg NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL} \
-            -t track-my-cash:1.0 .
+        run: docker-compose up --build -d
+
 
       - name: Log in to the Heroku Container Registry
         run: heroku container:login
