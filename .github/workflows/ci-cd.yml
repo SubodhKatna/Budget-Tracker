@@ -1,80 +1,59 @@
-name: Budget-Tracker
+name: Budget-Tracker CI/CD
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: budget-tracker-app
+  HEROKU_APP_NAME: track-my-cash
+
 jobs:
-  build-and-test:
+  build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
-      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
-      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '20.9.0'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run lint
+      - name: Run Lint
         run: npm run lint
 
-      - name: Run format check
+      - name: Run Format Check
         run: npm run format
 
-      - name: Verify Commit Message
+      - name: Run Commit Lint
         run: npx commitlint --from=HEAD~1 --to=HEAD --verbose
 
-      - name: Create .env file for Docker
-        run: |
-          cat <<EOF > .env
-          PORT=4000
-          DATABASE_URL=${DATABASE_URL}
-          DIRECT_URL=${DIRECT_URL}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-          CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_URL}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_URL}
-          NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL}
-          NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL}
-          EOF
-
-      - name: Build Docker Image
-        run: docker build --build-arg DATABASE_URL=${DATABASE_URL} --build-arg DIRECT_URL=${DIRECT_URL} --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} --build-arg CLERK_SECRET_KEY=${CLERK_SECRET_KEY} --build-arg NEXT_PUBLIC_CLERK_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_URL} --build-arg NEXT_PUBLIC_CLERK_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_URL} --build-arg NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL} --build-arg NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL} -t budget-tracker-app:1.0 .
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest .
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Tag and Push to Docker Hub
-        run: |
-          docker tag budget-tracker-app:1.0 ${{ secrets.DOCKERHUB_USERNAME }}/budget-tracker-app:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/budget-tracker-app:latest
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
   deploy:
     name: Deploy to Heroku
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    needs: build-and-push
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
@@ -83,10 +62,10 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Pull Docker image from Docker Hub
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/budget-tracker-app:latest
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
-      - name: Tag Docker image for Heroku
-        run: docker tag ${{ secrets.DOCKERHUB_USERNAME }}/budget-tracker-app:latest registry.heroku.com/track-my-cash/web
+      - name: Tag image for Heroku
+        run: docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web
 
       - name: Log in to Heroku Container Registry
         run: heroku container:login
@@ -95,21 +74,22 @@ jobs:
 
       - name: Set Heroku config vars
         run: |
-          heroku config:set --app track-my-cash DATABASE_URL=${{ secrets.DATABASE_URL }}
-          heroku config:set --app track-my-cash DIRECT_URL=${{ secrets.DIRECT_URL }}
-          heroku config:set --app track-my-cash CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
-          heroku config:set --app track-my-cash NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          heroku config:set --app track-my-cash NEXT_PUBLIC_CLERK_SIGN_UP_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
-          heroku config:set --app track-my-cash NEXT_PUBLIC_CLERK_SIGN_IN_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
-          heroku config:set --app track-my-cash NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
-          heroku config:set --app track-my-cash NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
+          heroku config:set --app ${{ env.HEROKU_APP_NAME }} \
+            DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            DIRECT_URL=${{ secrets.DIRECT_URL }} \
+            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }} \
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} \
+            NEXT_PUBLIC_CLERK_SIGN_UP_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_URL }} \
+            NEXT_PUBLIC_CLERK_SIGN_IN_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_URL }} \
+            NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }} \
+            NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push Docker image to Heroku
-        run: docker push registry.heroku.com/track-my-cash/web
+        run: docker push registry.heroku.com/${{ env.HEROKU_APP_NAME }}/web
 
-      - name: Release the Image to Heroku
-        run: heroku container:release web --app track-my-cash
+      - name: Release app on Heroku
+        run: heroku container:release web --app ${{ env.HEROKU_APP_NAME }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
