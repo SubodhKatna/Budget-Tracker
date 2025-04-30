@@ -15,11 +15,11 @@ services:
         NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL}
     container_name: budget-tracker-app
     ports:
-      - "8000:8000"
+      - "9000:9000"
     env_file:
       - .env
     environment:
-      - PORT=4000
+      - PORT=9000
       - DATABASE_URL=${DATABASE_URL}
       - DIRECT_URL=${DIRECT_URL}
       - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
